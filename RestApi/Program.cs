@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RestApi.Data;
+using RestApi.Service;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +33,12 @@ builder.Services.AddAuthentication(options =>
        ValidateIssuerSigningKey = true
     };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+});
+builder.Services.AddScoped<TokenService>();
 
 var app = builder.Build();
 

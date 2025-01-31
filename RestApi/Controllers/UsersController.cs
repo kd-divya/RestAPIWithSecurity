@@ -11,7 +11,6 @@ namespace RestApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _applicationDbContext;
@@ -26,6 +25,7 @@ namespace RestApi.Controllers
 
 
         [HttpGet(Name = "GetUsersList")]
+        [Authorize(Roles = "Admin, User")]
         public IActionResult GetUsers()
         {
             var users = _applicationDbContext.Users.ToList();
@@ -37,13 +37,15 @@ namespace RestApi.Controllers
         }
 
         [HttpPost(Name = "SaveUser")]
+        [Authorize(Roles = "Admin")]
         public IActionResult SaveUser([FromBody] UserDTO userData)
         {
             _applicationDbContext.Users.Add(new Models.User
             {
                 UserName = userData.UserName,
                 Email = userData.Email,
-                Password = userData.Password
+                Password = userData.Password,
+                Role = userData.Role
             });
             _applicationDbContext.SaveChanges();
             return Ok("Data Saved Successfully");
